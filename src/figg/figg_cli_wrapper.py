@@ -2,7 +2,7 @@
 import argparse
 import sys
 import logging
-import figg
+import figg_core
 
 
 def main():
@@ -11,17 +11,15 @@ def main():
     logging.basicConfig(level=logging.INFO)
         
     # Parses input parameters
-    parser = argparse.ArgumentParser(
-            description='figg')
-    parser.add_argument('input_file',
-                        help='Input file')
+    parser = argparse.ArgumentParser(description='figg')
+    parser.add_argument('input_file', help='Input file')
     parser.add_argument('--circular', dest='circular', action='store_const',
                         default=False, const=True, 
                         help='A flag indicating if the genome is circular.')
     parser.add_argument('--output-format', dest='output_format', action='store', 
                         required = True, choices=set(["mega", "paup", "phylip", "all"]),
                         help='The output format')
-    args = self.parser.parse_args()
+    args = parser.parse_args()
     
     # Read input parameters
     input_file = args.input_file
@@ -33,7 +31,7 @@ def main():
     
     # Calls the program
     try:
-        figg.run_figg(input_file, is_circular, output_format)
+        figg_core.run_figg(input_file, is_circular, output_format)
         logging.error("Figg finished!")
     except Exception, e:
         logging.error("Figg raised an error: [%s]" % str(e))
