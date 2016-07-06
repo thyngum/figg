@@ -2,8 +2,8 @@
 import argparse
 import sys
 import logging
-import figg_core
-
+import figg_core.figg_core as figg_core
+import figg_nj.figg_nj as figg_nj
 
 def main():
     
@@ -18,7 +18,7 @@ def main():
                         help='A flag indicating if the genome is circular.')
     parser.add_argument('--output-format', dest='output_format', action='store', 
                         required = True, choices=set(["mega", "paup", "phylip", "all"]),
-                        help='The output format')
+                        help='The output format (mega, paup, phylip, all)')
     args = parser.parse_args()
     
     # Read input parameters
@@ -39,3 +39,4 @@ def main():
     
 if __name__ == '__main__':
     main()
+    
