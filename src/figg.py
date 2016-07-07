@@ -3,7 +3,9 @@ import argparse
 import sys
 import logging
 import figg_core.figg_core as figg_core
+import figg_dist.figg_dist as figg_dist
 import figg_nj.figg_nj as figg_nj
+
 
 def main():
     
@@ -30,12 +32,15 @@ def main():
     logging.info("Output format: [%s]" % output_format)
     
     # Calls the program
+    figg_core.run_figg(input_file, is_circular, output_format)
+
+"""    
     try:
         figg_core.run_figg(input_file, is_circular, output_format)
-        logging.error("Figg finished!")
+        logging.info("Done!")
     except Exception, e:
         logging.error("Figg raised an error: [%s]" % str(e))
-    
+"""    
     
 if __name__ == '__main__':
     main()
