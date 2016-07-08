@@ -2,6 +2,7 @@ import logging
 
 import figg_dist.figg_dist as figg_dist
 import figg_nj.figg_nj as figg_nj
+import figg_output.figg_output as figg_output 
 
 def run_figg(input_file, is_circular, output_format, verbose):
 
@@ -78,27 +79,27 @@ def run_figg(input_file, is_circular, output_format, verbose):
 		# Print adjacency matrices for each genome
 		print "Adjacency matrices for each genome:\n"
 		for i in range(num_genomes):
-			print_matrix(M[i], ref_string)		
+			figg_output.print_matrix(M[i], ref_string)		
 
 		# Print frequency matrices
 		print "Positive and negative frequency matrices:\n"
-		print_matrix(positive_freq_matrix, ref_string)
-		print_matrix(negative_freq_matrix, ref_string)
+		figg_output.print_matrix(positive_freq_matrix, ref_string)
+		figg_output.print_matrix(negative_freq_matrix, ref_string)
 
 		# Print distance matrices
 		print "Uncorrected distance matrix:\n"		
-		print_matrix(distance_matrix, names)
+		figg_output.print_matrix(distance_matrix, names)
 		print "Corrected distance matrix:\n"
-		print_matrix(corrected_distance_matrix, names)
+		figg_output.print_matrix(corrected_distance_matrix, names)
 
 	# Write the output
-	print_matrix_to_file(distance_matrix, "distance_matrix.tsv", names)	# For these, find how to get the path of input files
-	print_matrix_to_file(corrected_distance_matrix, "corrected_distance_matrix.tsv", names)	
+	figg_output.print_matrix_to_file(distance_matrix, "distance_matrix.tsv", names)	# For these, find how to get the path of input files
+	figg_output.print_matrix_to_file(corrected_distance_matrix, "corrected_distance_matrix.tsv", names)	
 
 	"""
-	print_matrix_to_file(positive_freq_matrix, ref_string, "fplus_admat.txt")
-	print_matrix_to_file(negative_freq_matrix, ref_string, "fneg_admat.txt")
-	print_mega_format(corrected_distance_matrix, names, "corrected_distmat.meg")
+	figg_output.print_matrix_to_file(positive_freq_matrix, ref_string, "fplus_admat.txt")
+	figg_output.print_matrix_to_file(negative_freq_matrix, ref_string, "fneg_admat.txt")
+	figg_output.print_mega_format(corrected_distance_matrix, names, "corrected_distmat.meg")
 	"""
 	
 	# Build the NJ tree 
@@ -106,93 +107,3 @@ def run_figg(input_file, is_circular, output_format, verbose):
 	n_CD = [corrected_distance_matrix[i][:] for i in range(len(corrected_distance_matrix))]
 	nj(n_CD,refs,[])
 	"""
-
-
-def print_matrix(matrix, labels = False):
-	"Prints a matrix with optional row labels"
-	
-	string = ""
-	k = 0
-	for i in matrix:
-		n = 0
-		for j in i:
-			if n == 0:
-				if ( labels ):
-					string += labels[k] + '\t' + '%.4f'%j
-				else:
-					string += '%.4f'%j
-			else:
-				string += '\t' + '%.4f'%j
-			n += 1
-		string += '\n'
-		k += 1
-
-	print string
-
-
-def print_matrix_to_file(matrix, filename, labels = False):
-
-	f = open(filename,'w')
-	string = ""
-	k = 0
-	for i in matrix:
-		n = 0
-		for j in i:
-			if n == 0:
-				if ( labels ):
-					string += labels[k] + '\t' + '%.4f'%j
-				else:
-					string += '%.4f'%j
-			else:
-				string += '\t' + '%.4f'%j
-			n += 1
-		string += '\n'
-		k += 1
-	f.write(string)
-	f.close()
-
-""""
-def print_mega_format(matrix, labels, filename):
-
-	num_genomes = len(matrix)
-
-	f = open(filename, 'w')
-
-	max_num_length = 0
-	for i in matrix:
-		if (len(str(int(max(i)))) > max_num_length):
-			max_num_length = len(str(int(max(i))))
-
-	# Header
-	text = ("#mega\n!Title: Corrected adjacency distance matrix;\n" +
-		"!Format DataType=Distance DataFormat=LowerLeft NTaxa=" + str(num_genomes) + ";\n\n")
-
-	# List of labels
-	for i in range(num_genomes):
-		text += '[' + " "*(len(str(num_genomes)) - len(str(i + 1))) + str(i + 1) + '] ' + "#" + labels[i] +"\n"
-	
-	# First row of distance matrix
-	text += '\n[' + '\t'
-	x = [str(i) for i in range(1, num_genomes + 1)]
-	for q in x[:-1]: 
-		text += q + '\t'
-	text += x[-1] + ']\n'
-
-	# Body of distance matrix
-	k = 1
-	text += '[ 1]'
-	for i in range(num_genomes):
-		n = 0
-		for j in range(i):
-			if n == 0:
-				text += '[' + " "*(len(str(num_genomes)) - len(str(i + 1))) + str(i + 1) + ']\t' + '%.4f'%(matrix[i][j])
-			else:
-				#g = max_num_length - len(str(int(matrix[i][j])))
-				text += '\t' + '%.4f'%(matrix[i][j])
-			n += 1
-		text = text + '\n'
-		k += 1
-
-	f.write(text)
-	f.close()
-"""
