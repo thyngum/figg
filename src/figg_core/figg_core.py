@@ -1,5 +1,8 @@
 import logging
 
+import figg_dist.figg_dist as figg_dist
+import figg_nj.figg_nj as figg_nj
+
 def run_figg(input_file, is_circular, output_format):
 
 	# Global names
@@ -21,10 +24,6 @@ def run_figg(input_file, is_circular, output_format):
 	for i in range(len(strings)):
 		strings[i] = strings[i].split(" ")
 	num_genomes = len(strings)
-
-	logging.info("Number of genomes: %i" % num_genomes); 
-	logging.info("Genome labels: %s" % names); 
-	logging.info("Gene strings: %s" % strings); 
 
 	# If genome is circular then appends the first gene at the end of gene list
 	if is_circular:
@@ -67,44 +66,39 @@ def run_figg(input_file, is_circular, output_format):
 	rem = rseq[1:].index(rseq[0]) + 1
 	rseq.pop(rem)
 
-	print_matrix(ref_string_adj_matrix)
-
-"""
 	dim = [len(ref_string_adj_matrix), len(ref_string_adj_matrix[0])]
-	s = len(seqs) + 1
-	print "Genomes: " + str(s)
-	print '^       ' + 'Label'
+	s = len(seqs) + 1	
 	m = len(str(len(ref_string_adj_matrix)))
-	for i in range(len(names)):
-		print '^(' + ' '*(m-len(str(i+1))) + str(i+1) + ') ' + '\t' + names[i]
 
-	print "Workspace dimension: " + str(dim[0]) + " X " + str(dim[0])
-	print '^     ' + 'Item' + '\t\t' + 'first found in'
-	m = len(str(s))
-	for i in range(len(rseq)):
-		h = len(rseq[i])
-		g = max([len(k) for k in rseq])
-		print '^(' + ' '*(m - len(str(i+1))) + str(i+1) + ')' + ' '*(g-len(rseq[i]) +2) + \
-		rseq[i] +  ' '*(len(str(i))-1) + '\t\t\t' + '%s' % (first_seen[i])
+	logging.info("Number of genomes: %i" % num_genomes)
+	logging.info("Workspace dimension: %ix%i\n" % (dim[0], dim[0]))
 
-	D,M = dmat(ref_string_adj_matrix,rseq,seqs)
-	CD,fp,fn = Cdmat(M)
+	D,M = figg_dist.dmat(ref_string_adj_matrix, rseq, seqs)
+	CD,fp,fn = figg_dist.Cdmat(M)
 	
 	names = tuple(names)
 	refs = list(names)
-	
+
 	n_CD = [CD[i][:] for i in range(len(CD))]
-	nj(n_CD,refs,[])
+	#nj(n_CD,refs,[])
 
-	# writing matrices to files
-	# ext =  raw_input('Select output format: \n[M]EGA (.meg)\n[P]hylip (.phy)\n[N]exus (.nex)\n[A]ll\n[No]ne\n')
-
-
-
+	# Print adjacency matrices for each genome
+	"""
 	for i in range(num_genomes):
-		# print_matrix(M[i], rseq)
-		print_matrix_to_file(M[i], rseq, names[i] + '_admat.txt')
+		print_matrix(M[i], rseq)
+	"""
 
+	# Print frequency matrices
+	"""
+	print_matrix(fp, rseq)
+	print_matrix(fn, rseq)
+	"""
+
+	# Print distance matrices
+	print_matrix(D, names)
+	print_matrix(CD, names)
+
+"""
 	print_matrix_to_file(fp, rseq, "fplus_admat.txt")
 	print_matrix_to_file(fn, rseq, "fneg_admat.txt")
 

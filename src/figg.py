@@ -1,11 +1,10 @@
 #!/usr/bin/env python
+
 import argparse
 import sys
 import logging
-import figg_core.figg_core as figg_core
-import figg_dist.figg_dist as figg_dist
-import figg_nj.figg_nj as figg_nj
 
+import figg_core.figg_core as figg_core
 
 def main():
     
