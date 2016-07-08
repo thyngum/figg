@@ -6,10 +6,12 @@ import figg_nj.figg_nj as figg_nj
 def run_figg(input_file, is_circular, output_format):
 
 	# Global names
-	names = []						# List of genome labels
-	strings = []					# List of gene strings
-	num_genomes = 0					# Number of genomes in input
-	ref_string_adj_matrix = []		# Adjacency matrix for the reference string (a.k.a. the workspace)
+	names = []                      # List of genome labels
+	strings = []                    # List of gene strings
+	num_genomes = 0                 # Number of genomes in input
+	ref_string = []                 # Reference gene string   
+	ref_string_adj_matrix = []      # Adjacency matrix for the reference string (a.k.a. the workspace)
+	workspace_dimension = 0         # Number of genes in the workspace
 
 	# Reads input file
 	f = open(input_file, "rU")
@@ -25,86 +27,78 @@ def run_figg(input_file, is_circular, output_format):
 		strings[i] = strings[i].split(" ")
 	num_genomes = len(strings)
 
-	# If genome is circular then appends the first gene at the end of gene list
+	# If genome is circular then appends the first gene at the end of the gene list
 	if is_circular:
 		[i.append(i[0]) for i in strings]
 
 	# Sets the reference string and delete it from the list of strings 
-	rseq = strings[0] # rseq is the reference string
-	del strings[0] # seqs is a list of the other sequences
-	seqs = strings
-	first_seen = [names[0]]*len(rseq)
-	Rnames = tuple(rseq) # Labels in the reference string
-	# k = len(seqs) + 1
+	ref_string = strings[0] 
+	del strings[0] 
+	first_seen = [names[0]]*len(ref_string)
 
 	# Computes the adjacency matrix for the reference string
-	n = len(set(rseq))
-	ref = [rseq.index(i) for i in rseq]
+	n = len(set(ref_string))
+	ref = [ref_string.index(i) for i in ref_string]
 	ref_string_adj_matrix = [[0]*n for i in range(n)]
-	for i in range(len(ref)-1):
-		if "-" in rseq[i+1]:
-			ref_string_adj_matrix[ref[i]][ref[i+1]] = -1
+	for i in range(len(ref) - 1):
+		if "-" in ref_string[i + 1]:
+			ref_string_adj_matrix[ref[i]][ref[i + 1]] = -1
 		else:
-			ref_string_adj_matrix[ref[i]][ref[i+1]] = 1
+			ref_string_adj_matrix[ref[i]][ref[i + 1]] = 1
 
-	# Goes through all other sequences in search for new genes and extends the dimension 
-	# of the workspace by adding columns and rows. After this, reference will include all 
-	# genes, with each new gene added to the its end. 
+	# Goes through all other sequences and looks for new genes. Extends the dimension 
+	# of the workspace by adding columns and rows. After this, reference string will include  
+	# all found genes, with each new gene added to its end. 
 	k = 1
 	for i in strings:
 		for j in i:
-			a = j not in rseq
-			b =  j.replace('-','') not in rseq
+			a = j not in ref_string
+			b =  j.replace('-','') not in ref_string
 			if a & b:
-				rseq.append(j)
+				ref_string.append(j)
 				ref_string_adj_matrix.append([0]*len(ref_string_adj_matrix))
 				first_seen.append(names[k])
 				for x in range(len(ref_string_adj_matrix)):
 					ref_string_adj_matrix[x] += [0]
 		k += 1
+	rem = ref_string[1:].index(ref_string[0]) + 1
+	ref_string.pop(rem)
 
-	rem = rseq[1:].index(rseq[0]) + 1
-	rseq.pop(rem)
-
-	dim = [len(ref_string_adj_matrix), len(ref_string_adj_matrix[0])]
-	s = len(seqs) + 1	
-	m = len(str(len(ref_string_adj_matrix)))
+	workspace_dimension = [len(ref_string_adj_matrix), len(ref_string_adj_matrix[0])]
 
 	logging.info("Number of genomes: %i" % num_genomes)
-	logging.info("Workspace dimension: %ix%i\n" % (dim[0], dim[0]))
+	logging.info("Workspace dimension: %ix%i\n" % (workspace_dimension[0], workspace_dimension[0]))
 
-	D,M = figg_dist.dmat(ref_string_adj_matrix, rseq, seqs)
-	CD,fp,fn = figg_dist.Cdmat(M)
+	distance_matrix, M = figg_dist.dmatrix(ref_string_adj_matrix, ref_string, strings)
+	corrected_distance_matrix, positive_freq_matrix, negative_freq_matrix = figg_dist.cdmatrix(M)
 	
-	names = tuple(names)
-	refs = list(names)
-
-	n_CD = [CD[i][:] for i in range(len(CD))]
-	#nj(n_CD,refs,[])
-
 	# Print adjacency matrices for each genome
-	"""
-	for i in range(num_genomes):
-		print_matrix(M[i], rseq)
-	"""
+	# for i in range(num_genomes):
+	# 	print_matrix(M[i], ref_string)
 
 	# Print frequency matrices
-	"""
-	print_matrix(fp, rseq)
-	print_matrix(fn, rseq)
-	"""
+	# print_matrix(positive_freq_matrix, ref_string)
+	# print_matrix(negative_freq_matrix, ref_string)
 
 	# Print distance matrices
-	print_matrix(D, names)
-	print_matrix(CD, names)
+	print_matrix(distance_matrix, names)
+	print_matrix(corrected_distance_matrix, names)
+	print_matrix_to_file(distance_matrix, "distance_matrix.tsv", names)	# For these, find how to get the path of input files
+	print_matrix_to_file(corrected_distance_matrix, "corrected_distance_matrix.tsv", names)	
 
-"""
-	print_matrix_to_file(fp, rseq, "fplus_admat.txt")
-	print_matrix_to_file(fn, rseq, "fneg_admat.txt")
+	"""
+	print_matrix_to_file(positive_freq_matrix, ref_string, "fplus_admat.txt")
+	print_matrix_to_file(negative_freq_matrix, ref_string, "fneg_admat.txt")
+	print_mega_format(corrected_distance_matrix, names, "corrected_distmat.meg")
+	"""
+	
+	# Build the NJ tree 
+	"""
+	n_CD = [corrected_distance_matrix[i][:] for i in range(len(corrected_distance_matrix))]
+	nj(n_CD,refs,[])
+	"""
 
-	print_matrix_to_file(CD, names, "test")
-	print_mega_format(CD, names, "corrected_distmat.meg")
-"""
+
 
 def print_matrix(matrix, labels = False):
 	"Prints a matrix with optional row labels"
@@ -128,25 +122,28 @@ def print_matrix(matrix, labels = False):
 	print string
 
 
-"""
-def print_matrix_to_file(matrix, labels, filename):
+def print_matrix_to_file(matrix, filename, labels = False):
 
 	f = open(filename,'w')
-	text = ""
+	string = ""
 	k = 0
 	for i in matrix:
 		n = 0
 		for j in i:
 			if n == 0:
-				text += labels[k] + '\t' + '%.4f'%j
+				if ( labels ):
+					string += labels[k] + '\t' + '%.4f'%j
+				else:
+					string += '%.4f'%j
 			else:
-				text += '\t' + '%.4f'%j
+				string += '\t' + '%.4f'%j
 			n += 1
-		text += '\n'
+		string += '\n'
 		k += 1
-	f.write(text)
+	f.write(string)
 	f.close()
 
+""""
 def print_mega_format(matrix, labels, filename):
 
 	num_genomes = len(matrix)
