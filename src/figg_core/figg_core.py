@@ -3,7 +3,7 @@ import logging
 import figg_dist.figg_dist as figg_dist
 import figg_nj.figg_nj as figg_nj
 
-def run_figg(input_file, is_circular, output_format):
+def run_figg(input_file, is_circular, output_format, verbose):
 
 	# Global names
 	names = []                      # List of genome labels
@@ -66,23 +66,32 @@ def run_figg(input_file, is_circular, output_format):
 
 	workspace_dimension = [len(ref_string_adj_matrix), len(ref_string_adj_matrix[0])]
 
-	logging.info("Number of genomes: %i" % num_genomes)
-	logging.info("Workspace dimension: %ix%i\n" % (workspace_dimension[0], workspace_dimension[0]))
+	if ( verbose ):
+		print "Number of genomes: %i" % num_genomes
+		print "Workspace dimension: %ix%i\n" % (workspace_dimension[0], workspace_dimension[0])
 
 	distance_matrix, M = figg_dist.dmatrix(ref_string_adj_matrix, ref_string, strings)
 	corrected_distance_matrix, positive_freq_matrix, negative_freq_matrix = figg_dist.cdmatrix(M)
 	
-	# Print adjacency matrices for each genome
-	# for i in range(num_genomes):
-	# 	print_matrix(M[i], ref_string)
+	if ( verbose ):
 
-	# Print frequency matrices
-	# print_matrix(positive_freq_matrix, ref_string)
-	# print_matrix(negative_freq_matrix, ref_string)
+		# Print adjacency matrices for each genome
+		print "Adjacency matrices for each genome:\n"
+		for i in range(num_genomes):
+			print_matrix(M[i], ref_string)		
 
-	# Print distance matrices
-	print_matrix(distance_matrix, names)
-	print_matrix(corrected_distance_matrix, names)
+		# Print frequency matrices
+		print "Positive and negative frequency matrices:\n"
+		print_matrix(positive_freq_matrix, ref_string)
+		print_matrix(negative_freq_matrix, ref_string)
+
+		# Print distance matrices
+		print "Uncorrected distance matrix:\n"		
+		print_matrix(distance_matrix, names)
+		print "Corrected distance matrix:\n"
+		print_matrix(corrected_distance_matrix, names)
+
+	# Write the output
 	print_matrix_to_file(distance_matrix, "distance_matrix.tsv", names)	# For these, find how to get the path of input files
 	print_matrix_to_file(corrected_distance_matrix, "corrected_distance_matrix.tsv", names)	
 
@@ -97,7 +106,6 @@ def run_figg(input_file, is_circular, output_format):
 	n_CD = [corrected_distance_matrix[i][:] for i in range(len(corrected_distance_matrix))]
 	nj(n_CD,refs,[])
 	"""
-
 
 
 def print_matrix(matrix, labels = False):
