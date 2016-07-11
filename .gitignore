@@ -1,2 +1,2 @@
-*.pyc
-figg_cgi_wrapper.py
+**/*.pyc
+src/figg_cgi_wrapper.py
