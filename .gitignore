@@ -1,2 +1,5 @@
 **/*.pyc
 src/figg_cgi_wrapper.py
+data/*
+Marc/*
+utils/*
