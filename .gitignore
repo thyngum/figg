@@ -1,4 +1,5 @@
-**/*.pyc
+*.pyc
+*.tsv
 src/figg_cgi_wrapper.py
 data/*
 Marc/*
