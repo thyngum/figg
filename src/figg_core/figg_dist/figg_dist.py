@@ -4,22 +4,13 @@ import logging
 Functions to work with distance matrices
 """
 
-def diff(i, j, matrix_1, matrix_2):
-	"Compares the value of elements in row i and column j of two matrices"
-
-	if matrix_1[i][j] == matrix_2[i][j]:
-		return(0)
-	else:
-		return(1)
-
-
 def AD(matrix_1, matrix_2):
 	"Computes the measure of differences between two adjacency matrices, AD"
 
 	d = 0 
 	for i in range(len(matrix_1)):
 		for j in range(len(matrix_2)):
-			if diff(i, j, matrix_1, matrix_2):
+			if matrix_1[i][j] == matrix_2[i][j]:
 				d += 1
 	
 	return(d)

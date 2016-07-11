@@ -7,12 +7,12 @@ import figg_output.figg_output as figg_output
 def run_figg(input_file, is_circular, output_format, verbose):
 
 	# Global names
-	names = []                      # List of genome labels
-	strings = []                    # List of gene strings
+	genome_labels = []              # List of genome labels
+	gene_orders = []                # List with the order of genes in each input genome
 	num_genomes = 0                 # Number of genomes in input
-	ref_string = []                 # Reference gene string   
-	ref_string_adj_matrix = []      # Adjacency matrix for the reference string (a.k.a. the workspace)
-	workspace_dimension = 0         # Number of genes in the workspace
+	reference_order = []			# Reference gene order
+	reference_matrix = []           # Reference adjacency matrix
+	first_seen = []                 # Genome in which each gene was first seen
 
 	# Reads input file
 	f = open(input_file, "rU")
@@ -20,90 +20,87 @@ def run_figg(input_file, is_circular, output_format, verbose):
 	temp = temp.split('>')
 	del temp[0]
 
-	# Get labels and gene strings
+	# Parses the input
 	for i in range(len(temp)):
-		names.append(temp[i].split('\n')[0])
-		strings.append(temp[i].split('\n')[1])
-	for i in range(len(strings)):
-		strings[i] = strings[i].split(" ")
-	num_genomes = len(strings)
+		genome_labels.append(temp[i].split('\n')[0])
+		gene_orders.append(temp[i].split('\n')[1])
+	for i in range(len(gene_orders)):
+		gene_orders[i] = gene_orders[i].split(" ")
+	num_genomes = len(gene_orders)
 
-	# If genome is circular then appends the first gene at the end of the gene list
+	# If genomes are circular then appends the first gene at the end of each gene order
 	if is_circular:
-		[i.append(i[0]) for i in strings]
+		[i.append(i[0]) for i in gene_orders]
 
-	# Sets the reference string and delete it from the list of strings 
-	ref_string = strings[0] 
-	del strings[0] 
-	first_seen = [names[0]]*len(ref_string)
-
-	# Computes the adjacency matrix for the reference string
-	n = len(set(ref_string))
-	ref = [ref_string.index(i) for i in ref_string]
-	ref_string_adj_matrix = [[0]*n for i in range(n)]
-	for i in range(len(ref) - 1):
-		if "-" in ref_string[i + 1]:
-			ref_string_adj_matrix[ref[i]][ref[i + 1]] = -1
+	# Initializes the reference order with that of the first genome and delete it from the list 
+	reference_order = gene_orders[0] 
+	del gene_orders[0]
+	first_seen = [genome_labels[0]]*len(reference_order)
+	if ( is_circular ):
+		del first_seen[-1]
+	
+	# Initializes the reference matrix
+	ref_index_list = [reference_order.index(i) for i in reference_order]
+	reference_matrix = [[0]*len(set(reference_order)) for i in range(len(set(reference_order)))]
+	for i in range(len(ref_index_list) - 1):
+		if "-" in reference_order[i + 1]:
+			reference_matrix[ref_index_list[i]][ref_index_list[i + 1]] = -1
 		else:
-			ref_string_adj_matrix[ref[i]][ref[i + 1]] = 1
+			reference_matrix[ref_index_list[i]][ref_index_list[i + 1]] = 1
 
-	# Goes through all other sequences and looks for new genes. Extends the dimension 
-	# of the workspace by adding columns and rows. After this, reference string will include  
-	# all found genes, with each new gene added to its end. 
+	# Extends the reference order and matrix by looking for new genes in all other input genomes
 	k = 1
-	for i in strings:
+	for i in gene_orders:
 		for j in i:
-			a = j not in ref_string
-			b =  j.replace('-','') not in ref_string
+			a = j not in reference_order
+			b = j.replace('-','') not in reference_order
 			if a & b:
-				ref_string.append(j)
-				ref_string_adj_matrix.append([0]*len(ref_string_adj_matrix))
-				first_seen.append(names[k])
-				for x in range(len(ref_string_adj_matrix)):
-					ref_string_adj_matrix[x] += [0]
-		k += 1
-	rem = ref_string[1:].index(ref_string[0]) + 1
-	ref_string.pop(rem)
-
-	workspace_dimension = [len(ref_string_adj_matrix), len(ref_string_adj_matrix[0])]
+				reference_order.append(j)
+				reference_matrix.append([0]*len(reference_matrix))
+				first_seen.append(genome_labels[k])
+				for x in range(len(reference_matrix)):
+					reference_matrix[x] += [0]
+       		k += 1
+	rem = reference_order[1:].index(reference_order[0]) + 1
+	reference_order.pop(rem)
 
 	if ( verbose ):
 		print "Number of genomes: %i" % num_genomes
-		print "Workspace dimension: %ix%i\n" % (workspace_dimension[0], workspace_dimension[0])
+		print "Number of genes in the workspace: %i" % len(reference_order)
+		print "  Gene\tFirst seen in"
+		for i in range(len(reference_order)):
+			print "  %s\t%s" % (reference_order[i], first_seen[i])
+		print ""
 
-	distance_matrix, M = figg_dist.dmatrix(ref_string_adj_matrix, ref_string, strings)
+	distance_matrix, M = figg_dist.dmatrix(reference_matrix, reference_order, gene_orders)
 	corrected_distance_matrix, positive_freq_matrix, negative_freq_matrix = figg_dist.cdmatrix(M)
-	
+
 	if ( verbose ):
 
 		# Print adjacency matrices for each genome
 		print "Adjacency matrices for each genome:\n"
 		for i in range(num_genomes):
-			figg_output.print_matrix(M[i], ref_string)		
+			figg_output.print_matrix(M[i], reference_order)		
 
 		# Print frequency matrices
 		print "Positive and negative frequency matrices:\n"
-		figg_output.print_matrix(positive_freq_matrix, ref_string)
-		figg_output.print_matrix(negative_freq_matrix, ref_string)
+		figg_output.print_matrix(positive_freq_matrix, reference_order)
+		figg_output.print_matrix(negative_freq_matrix, reference_order)
 
 		# Print distance matrices
 		print "Uncorrected distance matrix:\n"		
-		figg_output.print_matrix(distance_matrix, names)
+		figg_output.print_matrix(distance_matrix, genome_labels)
 		print "Corrected distance matrix:\n"
-		figg_output.print_matrix(corrected_distance_matrix, names)
+		figg_output.print_matrix(corrected_distance_matrix, genome_labels)
 
 	# Write the output
-	figg_output.print_matrix_to_file(distance_matrix, "distance_matrix.tsv", names)	# For these, find how to get the path of input files
-	figg_output.print_matrix_to_file(corrected_distance_matrix, "corrected_distance_matrix.tsv", names)	
+	# figg_output.print_matrix_to_file(distance_matrix, "distance_matrix.tsv", genome_labels)	# For these, find how to get the path of input files
+	# figg_output.print_matrix_to_file(corrected_distance_matrix, "corrected_distance_matrix.tsv", genome_labels)	
 
-	"""
-	figg_output.print_matrix_to_file(positive_freq_matrix, ref_string, "fplus_admat.txt")
-	figg_output.print_matrix_to_file(negative_freq_matrix, ref_string, "fneg_admat.txt")
-	figg_output.print_mega_format(corrected_distance_matrix, names, "corrected_distmat.meg")
-	"""
+	# figg_output.print_matrix_to_file(positive_freq_matrix, reference_order, "fplus_admat.txt")
+	# figg_output.print_matrix_to_file(negative_freq_matrix, reference_order, "fneg_admat.txt")
+	# figg_output.print_mega_format(corrected_distance_matrix, genome_labels, "corrected_distmat.meg")
 	
 	# Build the NJ tree 
-	"""
-	n_CD = [corrected_distance_matrix[i][:] for i in range(len(corrected_distance_matrix))]
-	nj(n_CD,refs,[])
-	"""
+	# n_CD = [corrected_distance_matrix[i][:] for i in range(len(corrected_distance_matrix))]
+	# nj(n_CD,refs,[])
