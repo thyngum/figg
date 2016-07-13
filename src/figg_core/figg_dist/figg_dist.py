@@ -47,7 +47,7 @@ def AD(matrix_1, matrix_2):
 
 
 def dist_matrix(adj_matrices):
-	"Computes uncorrected distance matrix (matrix of AD)" 
+	"Computes the uncorrected distance matrix (matrix of AD)" 
 
 	num_genomes = len(adj_matrices)
 	matrix = [[0]*num_genomes for i in range(num_genomes)]
