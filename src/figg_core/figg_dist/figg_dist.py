@@ -9,12 +9,12 @@ def adj_matrix(order, ref_order):
 
 	num_genes = len(set(ref_order))
 	matrix = [[0]*num_genes for i in range(num_genes)]
-	index_list = [ref_order.index(i) if i in ref_order else ref_order.index(i.replace('-','')) for i in order]
-	for i in range(len(index_list)-1):
-		if "-" in list(order[i+1]):
-			matrix[index_list[i]][index_list[i+1]] = -1
+	index_list = [ref_order.index(i) if i in ref_order else ref_order.index(i.replace('-', '')) for i in order]
+	for i in range(len(index_list) - 1):
+		if "-" in list(order[i + 1]):
+			matrix[index_list[i]][index_list[i + 1]] = -1
 		else:
-			matrix[index_list[i]][index_list[i+1]] = 1 
+			matrix[index_list[i]][index_list[i + 1]] = 1 
 
 	return matrix
 
@@ -65,7 +65,7 @@ def freq_matrix_pos(adj_matrices):
 	matrix = [[0]*num_genes for i in range(num_genes)]
 	for i in range(len(matrix)):
 		for j in range(len(matrix)):
-			matrix[i][j] = round(sum([1 for x in range(len(adj_matrices)) if adj_matrices[x][i][j] == 1]) / float(len(adj_matrices)),4)
+			matrix[i][j] = round(sum([1 for x in range(len(adj_matrices)) if adj_matrices[x][i][j] == 1]) / float(len(adj_matrices)), 4)
 	
 	return matrix
 
@@ -77,7 +77,7 @@ def freq_matrix_neg(adj_matrices):
 	matrix = [[0]*num_genes for i in range(num_genes)]
 	for i in range(len(matrix)):
 		for j in range(len(matrix)):
-			matrix[i][j] = round(sum([1 for x in range(len(adj_matrices)) if adj_matrices[x][i][j] == -1]) / float(len(adj_matrices)),4)
+			matrix[i][j] = round(sum([1 for x in range(len(adj_matrices)) if adj_matrices[x][i][j] == -1]) / float(len(adj_matrices)), 4)
 	
 	return matrix
 
