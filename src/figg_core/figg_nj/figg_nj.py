@@ -69,20 +69,20 @@ def nj(matrix, genomes, heights):
 		for i in range(len(matrix)):
 			temp = min([dist_norm(matrix, i, j) for j in range(len(matrix)) if i != j])
 			if min(temp ,minimum) == temp:
-				index_j = [dist_norm(matrix , i, j) for j in range(len(matrix)) if i != j].index(temp)
+				index_j = [dist_norm(matrix, i, j) for j in range(len(matrix)) if i != j].index(temp)
 				index_i = i
 				minimum = temp
 			
-		tree = "(" + str(genomes[index_i]) + ": " + str(edge_length(matrix,index_i,index_j)) +\
-			", " + str(genomes[index_j]) + ": " + str(edge_length(matrix,index_j,index_i)) + ")"		
+		tree = "(" + str(genomes[index_i]) + ": " + str(edge_length(matrix,index_i,index_j)) + \
+		         ", " + str(genomes[index_j]) + ": " + str(edge_length(matrix,index_j,index_i)) + ")"		
 		
 		new_genomes = genomes[:]
 		new_genomes.remove(genomes[index_i])
 		new_genomes.remove(genomes[index_j])
 		new_genomes.insert(0,tree)
-		heights += [matrix[index_i][index_j]/2]
+		heights += [matrix[index_i][index_j] / 2]
 
-		new_matrix = [[0]*(len(matrix) - 1) for x in range(len(matrix)-1)]
+		new_matrix = [[0]*(len(matrix) - 1) for x in range(len(matrix) - 1)]
 		for z in range(1, len(new_matrix)):
 			ind = genomes.index(new_genomes[z])
 			new_matrix[z][0] = new_matrix_val(matrix, ind, index_i, index_j)
