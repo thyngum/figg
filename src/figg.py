@@ -26,12 +26,15 @@ def main():
 	input_file = args.input_file
 	is_circular = args.circular
 	output_format = args.output_format
+	supported_formats = ['text', 'mega', 'nexus', 'phylip', 'all' ]
+	if ( output_format not in supported_formats ):
+		sys.exit("Format '%s' not supported (valid formats are 'text', 'mega', 'nexus', 'phylip' or 'all')" % output_format)
+
 	verbose = args.verbose
 
 	# logging.info("Input file: [%s]" % input_file)
 	# logging.info("Circular genomes: [%s]" % str(is_circular))
 	# logging.info("Output format: [%s]" % output_format)
-
 	if ( verbose ):
 	    if ( is_circular ):
 	        genome_type = 'circular'
@@ -43,13 +46,10 @@ def main():
 	# Calls the program
 	figg_core.run_figg(input_file, is_circular, output_format, verbose)
 
-"""    
 	try:
-	    figg_core.run_figg(input_file, is_circular, output_format)
-	    logging.info("Done!")
-	except Exception, e:
-	    logging.error("Figg raised an error: [%s]" % str(e))
-"""    
+	    figg_core.run_figg(input_file, is_circular, output_format, verbose)
+	except Exception, error:
+	    logging.error("Figg raised an error: [%s]" % str(error))
     
 if __name__ == '__main__':
 	main()

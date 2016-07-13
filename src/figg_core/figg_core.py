@@ -1,5 +1,9 @@
 import logging
 
+"""
+Core figg module
+"""
+
 import figg_dist.figg_dist as figg_dist
 import figg_nj.figg_nj as figg_nj
 import figg_output.figg_output as figg_output 
@@ -7,20 +11,24 @@ import figg_output.figg_output as figg_output
 def run_figg(input_file, is_circular, output_format, verbose):
 
 	# Global names
-	genome_labels = []              # List of genome labels
-	gene_orders = []                # List with the order of genes in each input genome
-	num_genomes = 0                 # Number of genomes in input
-	reference_order = []			# Reference gene order
-	reference_matrix = []           # Reference adjacency matrix
-	first_seen = []                 # Genome in which each gene was first seen
+	genome_labels = []                # List of genome labels
+	gene_orders = []                  # List with the order of genes in each input genome
+	num_genomes = 0                   # Number of genomes in input
+	ref_order = []		              # Reference gene order
+	ref_matrix = []                   # Reference adjacency matrix
+	first_seen = []                   # Genome in which each gene was first seen
+	''' >>> TODO <<<: Convert first_seen to a dictionary instead of a positional list? '''
+	adj_matrices = []                 # Set of adjacency matrices for each genome in input
+	dist_matrix = []                  # Matrix of observed differences
+	corrected_dist_matrix = []        # Matrix of corrected differences
 
-	# Reads input file
+	# Read input file
 	f = open(input_file, "rU")
 	temp = f.read()
 	temp = temp.split('>')
 	del temp[0]
 
-	# Parses the input
+	# Parse the input
 	for i in range(len(temp)):
 		genome_labels.append(temp[i].split('\n')[0])
 		gene_orders.append(temp[i].split('\n')[1])
@@ -28,79 +36,93 @@ def run_figg(input_file, is_circular, output_format, verbose):
 		gene_orders[i] = gene_orders[i].split(" ")
 	num_genomes = len(gene_orders)
 
-	# If genomes are circular then appends the first gene at the end of each gene order
+	# If genomes are circular then append the first gene at the end of each gene list
 	if is_circular:
 		[i.append(i[0]) for i in gene_orders]
 
-	# Initializes the reference order with that of the first genome and delete it from the list 
-	reference_order = gene_orders[0] 
+	# Initialize the reference order with that of the first genome and delete it from the list 
+	''' >>> TODO <<<: Perhaps find a way to avoid deleting it from the list '''
+	ref_order = gene_orders[0] 
 	del gene_orders[0]
-	first_seen = [genome_labels[0]]*len(reference_order)
+	first_seen = [genome_labels[0]]*len(ref_order)
+
+	# If genomes are circular the first gene will be duplicated at the end of first_seen
+	''' >>> TODO <<<: This issue will be solved if first_seen is converted to a dict  '''
 	if ( is_circular ):
 		del first_seen[-1]
 	
-	# Initializes the reference matrix
-	ref_index_list = [reference_order.index(i) for i in reference_order]
-	reference_matrix = [[0]*len(set(reference_order)) for i in range(len(set(reference_order)))]
-	for i in range(len(ref_index_list) - 1):
-		if "-" in reference_order[i + 1]:
-			reference_matrix[ref_index_list[i]][ref_index_list[i + 1]] = -1
+	# Initialize the reference matrix
+	num_genes = len(set(ref_order))
+	index_list = [ref_order.index(i) for i in ref_order]
+	ref_matrix = [[0]*num_genes for i in range(num_genes)]
+	for i in range(len(index_list) - 1):
+		if "-" in ref_order[i + 1]:
+			ref_matrix[index_list[i]][index_list[i + 1]] = -1
 		else:
-			reference_matrix[ref_index_list[i]][ref_index_list[i + 1]] = 1
+			ref_matrix[index_list[i]][index_list[i + 1]] = 1
 
-	# Extends the reference order and matrix by looking for new genes in all other input genomes
-	k = 1
-	for i in gene_orders:
-		for j in i:
-			a = j not in reference_order
-			b = j.replace('-','') not in reference_order
+	# Extend the reference order and matrix by looking for new genes in all other input genomes
+	for i in range(1,num_genomes):
+		for j in gene_orders[i - 1]: 
+			a = j not in ref_order
+			b = j.replace('-','') not in ref_order
 			if a & b:
-				reference_order.append(j)
-				reference_matrix.append([0]*len(reference_matrix))
-				first_seen.append(genome_labels[k])
-				for x in range(len(reference_matrix)):
-					reference_matrix[x] += [0]
-       		k += 1
-	rem = reference_order[1:].index(reference_order[0]) + 1
-	reference_order.pop(rem)
+				ref_order.append(j)
+				ref_matrix.append([0]*len(ref_matrix))
+				first_seen.append(genome_labels[i])
+				for x in range(len(ref_matrix)):
+					ref_matrix[x] += [0]
+	ref_order.pop(ref_order[1:].index(ref_order[0]) + 1)
 
+	# Compute all the matrices
+	adj_matrices = figg_dist.adj_matrix_set(ref_matrix, ref_order, gene_orders)
+	dist_matrix = figg_dist.dist_matrix(adj_matrices)
+	pos_freq_matrix = figg_dist.freq_matrix_pos(adj_matrices)
+	neg_freq_matrix = figg_dist.freq_matrix_neg(adj_matrices)
+	corrected_dist_matrix = figg_dist.dist_matrix_corrected(adj_matrices, pos_freq_matrix, neg_freq_matrix)
+
+	# Build the NJ tree 
+	tree, heights = figg_nj.nj(corrected_dist_matrix, genome_labels, [])
+
+	# Write the output
 	if ( verbose ):
+
+		# Print basic info
 		print "Number of genomes: %i" % num_genomes
-		print "Number of genes in the workspace: %i" % len(reference_order)
+		print "Number of genes in the workspace: %i" % len(ref_order)
 		print "  Gene\tFirst seen in"
-		for i in range(len(reference_order)):
-			print "  %s\t%s" % (reference_order[i], first_seen[i])
+		for i in range(len(ref_order)):
+			print "  %s\t%s" % (ref_order[i], first_seen[i])
 		print ""
-
-	distance_matrix, M = figg_dist.dmatrix(reference_matrix, reference_order, gene_orders)
-	corrected_distance_matrix, positive_freq_matrix, negative_freq_matrix = figg_dist.cdmatrix(M)
-
-	if ( verbose ):
 
 		# Print adjacency matrices for each genome
 		print "Adjacency matrices for each genome:\n"
 		for i in range(num_genomes):
-			figg_output.print_matrix(M[i], reference_order)		
+			figg_output.print_matrix(adj_matrices[i], ref_order)		
 
 		# Print frequency matrices
 		print "Positive and negative frequency matrices:\n"
-		figg_output.print_matrix(positive_freq_matrix, reference_order)
-		figg_output.print_matrix(negative_freq_matrix, reference_order)
+		figg_output.print_matrix(pos_freq_matrix, ref_order)
+		figg_output.print_matrix(neg_freq_matrix, ref_order)
 
 		# Print distance matrices
 		print "Uncorrected distance matrix:\n"		
-		figg_output.print_matrix(distance_matrix, genome_labels)
+		figg_output.print_matrix(dist_matrix, genome_labels)
 		print "Corrected distance matrix:\n"
-		figg_output.print_matrix(corrected_distance_matrix, genome_labels)
+		figg_output.print_matrix(corrected_dist_matrix, genome_labels)
 
-	# Write the output
-	# figg_output.print_matrix_to_file(distance_matrix, "distance_matrix.tsv", genome_labels)	# For these, find how to get the path of input files
-	# figg_output.print_matrix_to_file(corrected_distance_matrix, "corrected_distance_matrix.tsv", genome_labels)	
-
-	# figg_output.print_matrix_to_file(positive_freq_matrix, reference_order, "fplus_admat.txt")
-	# figg_output.print_matrix_to_file(negative_freq_matrix, reference_order, "fneg_admat.txt")
-	# figg_output.print_mega_format(corrected_distance_matrix, genome_labels, "corrected_distmat.meg")
+		# Print the NJ tree
+		print "NJ tree in Newick format:\n"
+		print tree
+		# print "Tree heights:\n"
+		# print heights
 	
-	# Build the NJ tree 
-	# n_CD = [corrected_distance_matrix[i][:] for i in range(len(corrected_distance_matrix))]
-	# nj(n_CD,refs,[])
+	# figg_output.print_matrix_to_file(dist_matrix, "dist_matrix.tsv", genome_labels)	# For these, find how to get the path of input files
+	# figg_output.print_matrix_to_file(corrected_dist_matrix, "corrected_dist_matrix.tsv", genome_labels)	
+	# figg_output.print_matrix_to_file(pos_freq_matrix, ref_order, "fplus_admat.txt")
+	# figg_output.print_matrix_to_file(neg_freq_matrix, ref_order, "fneg_admat.txt")
+	# figg_output.print_mega_format(corrected_dist_matrix, genome_labels, "corrected_distmat.meg")
+
+
+
+
