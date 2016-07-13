@@ -1,23 +1,23 @@
 import logging
 
+"""
+Function to write output
+"""
+
 def print_matrix(matrix, labels = False):
 	"Prints a matrix with optional row labels"
 	
 	string = ""
-	k = 0
-	for i in matrix:
-		n = 0
-		for j in i:
-			if n == 0:
+	for i in range(len(matrix)):
+		for j in range(len(matrix[i])):
+			if j == 0:
 				if ( labels ):
-					string += labels[k] + '\t' + '%.4f'%j
+					string += labels[i] + "\t%.4f" % matrix[i][j]
 				else:
-					string += '%.4f'%j
+					string += "%.4f" % matrix[i][j]
 			else:
-				string += '\t' + '%.4f'%j
-			n += 1
+				string += "\t%.4f" % matrix[i][j]
 		string += '\n'
-		k += 1
 
 	print string
 
@@ -27,25 +27,22 @@ def print_matrix_to_file(matrix, filename, labels = False):
 
 	f = open(filename,'w')
 	string = ""
-	k = 0
-	for i in matrix:
-		n = 0
-		for j in i:
-			if n == 0:
+	for i in range(len(matrix)):
+		for j in range(len(matrix[i])):
+			if j == 0:
 				if ( labels ):
-					string += labels[k] + '\t' + '%.4f'%j
+					string += labels[i] + "\t%.4f" % matrix[i][j]
 				else:
-					string += '%.4f'%j
+					string += "%.4f" % matrix[i][j]
 			else:
-				string += '\t' + '%.4f'%j
-			n += 1
+				string += "\t%.4f" % matrix[i][j]
 		string += '\n'
-		k += 1
 	f.write(string)
 	f.close()
 
-""""
+
 def print_mega_format(matrix, labels, filename):
+	"Prints a distance matrix in MEGA format"
 
 	num_genomes = len(matrix)
 
@@ -57,7 +54,7 @@ def print_mega_format(matrix, labels, filename):
 			max_num_length = len(str(int(max(i))))
 
 	# Header
-	text = ("#mega\n!Title: Corrected adjacency distance matrix;\n" +
+	text = ("#mega\n!Title: Figg distance matrix;\n" +
 		"!Format DataType=Distance DataFormat=LowerLeft NTaxa=" + str(num_genomes) + ";\n\n")
 
 	# List of labels
@@ -88,4 +85,14 @@ def print_mega_format(matrix, labels, filename):
 
 	f.write(text)
 	f.close()
-"""
+
+
+def print_phylip_format(matrix, labels, filename):
+	"Prints a distance matrix in Phylip format"
+
+	return()
+
+def print_nexus_format(matrix, labels, filename):
+	"Prints a distance matrix in PAUP*/NEXUS format"
+
+	return()

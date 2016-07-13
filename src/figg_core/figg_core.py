@@ -1,4 +1,5 @@
 import logging
+import os
 
 """
 Core figg module
@@ -82,9 +83,30 @@ def run_figg(input_file, is_circular, output_format, verbose):
 	corrected_dist_matrix = figg_dist.dist_matrix_corrected(adj_matrices, pos_freq_matrix, neg_freq_matrix)
 
 	# Build the NJ tree 
-	tree, heights = figg_nj.nj(corrected_dist_matrix, genome_labels, [])
+	tree, heights = figg_nj.nj(dist_matrix, genome_labels, [])
+	tree_corrected, heights_corrected = figg_nj.nj(corrected_dist_matrix, genome_labels, [])
 
 	# Write the output
+	abs_path = os.path.abspath(input_file)
+	output_path, input_filename = os.path.split(abs_path)
+	output_prefix = output_path + '/' + '.'.join(input_filename.split('.')[:-1])
+
+	if ( output_format == 'text' or output_format == 'all' ):
+		figg_output.print_matrix_to_file(dist_matrix, output_prefix + "_dist_matrix.tsv", genome_labels)	
+		figg_output.print_matrix_to_file(corrected_dist_matrix, output_prefix + "_corrected_dist_matrix.tsv", genome_labels)
+
+	if ( output_format == 'mega' or output_format == 'all' ):
+		figg_output.print_mega_format(dist_matrix, genome_labels, output_prefix + "_dist_matrix.meg")	
+		figg_output.print_mega_format(corrected_dist_matrix, genome_labels, output_prefix + "_corrected_dist_matrix.meg")
+
+	if ( output_format == 'phylip' or output_format == 'all' ):
+		figg_output.print_phylip_format(dist_matrix, genome_labels, output_prefix + "_dist_matrix.phy")	
+		figg_output.print_phylip_format(corrected_dist_matrix, genome_labels, output_prefix + "_corrected_dist_matrix.phy")	
+
+	if ( output_format == 'nexus' or output_format == 'all' ):
+		figg_output.print_nexus_format(dist_matrix, genome_labels, output_prefix + "_dist_matrix.nex")	
+		figg_output.print_nexus_format(corrected_dist_matrix, genome_labels, output_prefix + "_corrected_dist_matrix.nex")
+
 	if ( verbose ):
 
 		# Print basic info
@@ -112,17 +134,9 @@ def run_figg(input_file, is_circular, output_format, verbose):
 		figg_output.print_matrix(corrected_dist_matrix, genome_labels)
 
 		# Print the NJ tree
-		print "NJ tree in Newick format:\n"
-		print tree
-		# print "Tree heights:\n"
-		# print heights
-	
-	# figg_output.print_matrix_to_file(dist_matrix, "dist_matrix.tsv", genome_labels)	# For these, find how to get the path of input files
-	# figg_output.print_matrix_to_file(corrected_dist_matrix, "corrected_dist_matrix.tsv", genome_labels)	
-	# figg_output.print_matrix_to_file(pos_freq_matrix, ref_order, "fplus_admat.txt")
-	# figg_output.print_matrix_to_file(neg_freq_matrix, ref_order, "fneg_admat.txt")
-	# figg_output.print_mega_format(corrected_dist_matrix, genome_labels, "corrected_distmat.meg")
+		print "NJ tree from uncorrected distance matrix:\n"
+		print tree, "\n"
+		print "NJ tree from corrected distance matrix:\n"
+		print tree_corrected, "\n"
 
-
-
-
+		print "Output saved to '%s'." % output_path

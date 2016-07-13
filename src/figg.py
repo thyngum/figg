@@ -44,8 +44,6 @@ def main():
 	    print "Output format: %s" % output_format   
 
 	# Calls the program
-	figg_core.run_figg(input_file, is_circular, output_format, verbose)
-
 	try:
 	    figg_core.run_figg(input_file, is_circular, output_format, verbose)
 	except Exception, error:
