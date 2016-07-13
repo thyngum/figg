@@ -1,9 +1,0 @@
->genome1
-A B C D E
->genome2
-A -B C D E
->genome3
-A C D B E
->genome4
-A B C E
-
