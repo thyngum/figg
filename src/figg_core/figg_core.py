@@ -18,7 +18,6 @@ def run_figg(input_file, is_circular, output_format, verbose):
 	ref_order = []		              # Reference gene order
 	ref_matrix = []                   # Reference adjacency matrix
 	first_seen = []                   # Genome in which each gene was first seen
-	''' >>> TODO <<<: Convert first_seen to a dictionary instead of a positional list? '''
 	adj_matrices = []                 # Set of adjacency matrices for each genome in input
 	dist_matrix = []                  # Matrix of observed differences
 	corrected_dist_matrix = []        # Matrix of corrected differences
@@ -42,13 +41,9 @@ def run_figg(input_file, is_circular, output_format, verbose):
 		[i.append(i[0]) for i in gene_orders]
 
 	# Initialize the reference order with that of the first genome and delete it from the list 
-	''' >>> TODO <<<: Perhaps find a way to avoid deleting it from the list '''
 	ref_order = gene_orders[0] 
 	del gene_orders[0]
 	first_seen = [genome_labels[0]]*len(ref_order)
-
-	# If genomes are circular the first gene will be duplicated at the end of first_seen
-	''' >>> TODO <<<: This issue will be solved if first_seen is converted to a dict  '''
 	if ( is_circular ):
 		del first_seen[-1]
 	
