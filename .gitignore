@@ -3,3 +3,4 @@ src/figg_cgi_wrapper.py
 samples/NJ/*
 Marc/*
 utils/*
+C/*
