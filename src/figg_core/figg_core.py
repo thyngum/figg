@@ -5,7 +5,7 @@ import os
 Core figg module
 """
 
-import figg_dist.figg_dist as figg_dist
+import figg_matrices.figg_matrices as figg_matrices
 import figg_nj.figg_nj as figg_nj
 import figg_output.figg_output as figg_output 
 
@@ -71,11 +71,11 @@ def run_figg(input_file, is_circular, output_format, verbose):
 	ref_order.pop(ref_order[1:].index(ref_order[0]) + 1)
 
 	# Compute all the matrices
-	adj_matrices = figg_dist.adj_matrix_set(ref_matrix, ref_order, gene_orders)
-	dist_matrix = figg_dist.dist_matrix(adj_matrices)
-	pos_freq_matrix = figg_dist.freq_matrix_pos(adj_matrices)
-	neg_freq_matrix = figg_dist.freq_matrix_neg(adj_matrices)
-	corrected_dist_matrix = figg_dist.dist_matrix_corrected(adj_matrices, pos_freq_matrix, neg_freq_matrix)
+	adj_matrices = figg_matrices.adj_matrix_set(ref_matrix, ref_order, gene_orders)
+	dist_matrix = figg_matrices.dist_matrix(adj_matrices)
+	pos_freq_matrix = figg_matrices.freq_matrix_pos(adj_matrices)
+	neg_freq_matrix = figg_matrices.freq_matrix_neg(adj_matrices)
+	corrected_dist_matrix = figg_matrices.dist_matrix_corrected(adj_matrices, pos_freq_matrix, neg_freq_matrix)
 
 	# Build the NJ tree 
 	tree, heights = figg_nj.nj(dist_matrix, genome_labels, [])
