@@ -6,8 +6,10 @@ Core figg module
 """
 
 import figg_matrices.figg_matrices as figg_matrices
-import figg_nj.figg_nj as figg_nj
 import figg_output.figg_output as figg_output 
+
+
+import nj as nj
 
 def run_figg(input_file, is_circular, output_format, verbose):
 
@@ -78,8 +80,8 @@ def run_figg(input_file, is_circular, output_format, verbose):
 	corrected_dist_matrix = figg_matrices.dist_matrix_corrected(adj_matrices, pos_freq_matrix, neg_freq_matrix)
 
 	# Build the NJ tree 
-	tree, heights = figg_nj.nj(dist_matrix, genome_labels, [])
-	tree_corrected, heights_corrected = figg_nj.nj(corrected_dist_matrix, genome_labels, [])
+	tree, heights = nj.tree(dist_matrix, genome_labels, [])
+	tree_corrected, heights_corrected = nj.tree(corrected_dist_matrix, genome_labels, [])
 
 	# Write the output
 	abs_path = os.path.abspath(input_file)

@@ -49,7 +49,7 @@ def new_matrix_val(matrix, z, i, j):
 	return dist
 
 
-def nj(matrix, genomes, heights):
+def tree(matrix, genomes, heights):
 
 	if ( len(matrix) == 2 ):
 		# Base case or last iteration of the NJ algorithm
