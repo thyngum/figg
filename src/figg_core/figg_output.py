@@ -1,7 +1,7 @@
 import logging
 
 """
-Function to write output
+Functions to write output
 """
 
 def print_matrix(matrix, labels = False):

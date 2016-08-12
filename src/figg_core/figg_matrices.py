@@ -4,6 +4,46 @@ import logging
 Functions to compute distance matrices
 """
 
+def workspace(orders, labels, is_circular):
+	"Defines the workspace"
+
+	ref_order = []
+	ref_matrix = []
+	first_seen = []
+
+	# Initialize the reference order with that of the first genome and delete it from the list 
+	ref_order = orders[0] 
+	del orders[0]
+	first_seen = [labels[0]]*len(ref_order)
+	if ( is_circular ):
+		del first_seen[-1]
+	
+	# Initialize the reference matrix
+	num_genes = len(set(ref_order))
+	index_list = [ref_order.index(i) for i in ref_order]
+	ref_matrix = [[0]*num_genes for i in range(num_genes)]
+	for i in range(len(index_list) - 1):
+		if "-" in ref_order[i + 1]:
+			ref_matrix[index_list[i]][index_list[i + 1]] = -1
+		else:
+			ref_matrix[index_list[i]][index_list[i + 1]] = 1
+
+	# Extend the reference order and matrix by looking for new genes in all other input genomes
+	for i in range(1, len(set(labels))):
+		for j in orders[i - 1]: 
+			a = j not in ref_order
+			b = j.replace('-','') not in ref_order
+			if a & b:
+				ref_order.append(j)
+				ref_matrix.append([0]*len(ref_matrix))
+				first_seen.append(labels[i])
+				for x in range(len(ref_matrix)):
+					ref_matrix[x] += [0]
+	ref_order.pop(ref_order[1:].index(ref_order[0]) + 1)
+
+	return ref_order, ref_matrix, first_seen
+
+
 def adj_matrix(order, ref_order):
 	"Computes the adjacency matrix for a given genome"
 
