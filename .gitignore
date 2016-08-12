@@ -1,6 +1,7 @@
 *.pyc
 src/figg_cgi_wrapper.py
 samples/NJ/*
+samples/*.tsv
 Marc/*
 utils/*
 C/*
