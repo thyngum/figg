@@ -5,3 +5,9 @@ samples/*.tsv
 Marc/*
 utils/*
 C/*
+*.xml
+*.iml
+.idea/vcs.xml
+db.sqlite3
+key.py
+archive_old
