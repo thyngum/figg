@@ -8,6 +8,4 @@ C/*
 *.xml
 *.iml
 .idea/vcs.xml
-db.sqlite3
-key.py
 archive_old
