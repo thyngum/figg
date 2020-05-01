@@ -44,9 +44,9 @@ def main():
 	        genome_type = 'linear'    
 
 	    # logging.info("Input file: %s (genomes are %s)" % ( input_file, genome_type ))   
-	    print "Input file: %s (genomes are %s)" % ( input_file, genome_type )  
+	    print("Input file: %s (genomes are %s)" % ( input_file, genome_type ))  
 	    # logging.info("Output format: %s" % output_format) 
-	    print "Output format: %s" % output_format   
+	    print("Output format: %s" % output_format)   
 
 	# Initialize global variables
 	genome_labels = []                # List of genome labels
@@ -103,27 +103,27 @@ def main():
 	if ( verbose ):
 
 		# Print basic info
-		print "Number of genomes: %i" % num_genomes
-		print "Number of genes in the workspace: %i" % len(ref_order)
-		print "  Gene\tFirst seen in"
+		print("Number of genomes: %i" % num_genomes)
+		print("Number of genes in the workspace: %i" % len(ref_order))
+		print("  Gene\tFirst seen in")
 		for i in range(len(ref_order)):
-			print "  %s\t%s" % (ref_order[i], first_seen[i])
-		print ""
+			print("  %s\t%s" % (ref_order[i], first_seen[i]))
+		print("")
 
 		# Print adjacency matrices for each genome
-		print "Adjacency matrices for each genome:\n"
+		print("Adjacency matrices for each genome:\n")
 		for i in range(num_genomes):
 			figg_output.print_matrix(adj_matrices[i], ref_order)		
 
 		# Print frequency matrices
-		print "Positive and negative frequency matrices:\n"
+		print("Positive and negative frequency matrices:\n")
 		figg_output.print_matrix(pos_freq_matrix, ref_order)
 		figg_output.print_matrix(neg_freq_matrix, ref_order)
 
 		# Print distance matrices
-		print "Uncorrected distance matrix:\n"		
+		print("Uncorrected distance matrix:\n")		
 		figg_output.print_matrix(dist_matrix, genome_labels)
-		print "Corrected distance matrix:\n"
+		print("Corrected distance matrix:\n")
 		figg_output.print_matrix(corrected_dist_matrix, genome_labels)
 
 		'''
@@ -134,12 +134,12 @@ def main():
 		print tree_corrected, "\n"
 		'''
 
-		print "Output saved to '%s'." % output_path
+		print("Output saved to '%s'." % output_path)
 
 
 if __name__ == '__main__':
 	try: 
 		main()
-	except Exception, error:
+	except Exception as error:
 		logging.error("%s" % str(error))	
     

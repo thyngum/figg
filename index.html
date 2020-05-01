@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>FIGG</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Google Font (font-family: 'Open Sans', sans-serif;) -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700" rel="stylesheet">
+    <!-- Google Font (font-family: 'Poppins', sans-serif;) -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,400i,500,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <div style="margin-top: 1%" id="wrapper" class="wrapper">
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="tm-section services-area tm-padding-section bg-white">
+                <div class="container">
+                    <div class="row justify-content-center mt-30-reverse">
+                        <div class="col-lg-12 col-md-12 col-12 mt-30">
+                            <div id="main" style="margin-top: 3%" align="center">
+                                <form method="POST" enctype="multipart/form-data" class="form-horizontal">
+                                    <p>File:</p>
+                                    <div class="form-group">
+                                        <div class="col-md-8">
+                                            <input type="file" name="csv_file" id="csv_file" required class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-bottom: 1.5%;" class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" name="circular" id="circular">
+                                        <label class="form-check-label" for="circular">Circular?</label>
+                                    </div>
+
+                                    <p>Output format:</p>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" type="radio" name="outputformat" id="textinput" value="text" checked>
+                                      <label class="form-check-label" for="textinput">Text (default)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" type="radio" name="outputformat" id="megainput" value="mega">
+                                      <label class="form-check-label" for="megainput">Mega</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" type="radio" name="outputformat" id="nexusinput" value="nexus">
+                                      <label class="form-check-label" for="nexusinput">Nexus</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" type="radio" name="outputformat" id="phylipinput" value="phylip">
+                                      <label class="form-check-label" for="phylipinput">Phylip</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" type="radio" name="outputformat" id="allinput" value="all">
+                                      <label class="form-check-label" for="allinput">All</label>
+                                    </div>
+
+                                    <div style="margin-top: 2.5%;" class="form-group">
+                                        <button class="btn btn-success"> <span class="glyphicon glyphicon-upload"></span>Upload</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!--// Main Content -->
+
+    </div>
+
+    <!-- Js Files -->
+    <script src="https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-3.5.0.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <!--// Js Files -->
+
+    <style>
+    h4 {
+        font-size: 34px;
+        font-weight: 300;
+        line-height: 1.3;
+        color: #2e3d49;
+        text-align: center;
+        font-family: "Open Sans", sans-serif;
+    }
+
+    h6 {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #525c65;
+        margin: 15px 0;
+        text-align: center;
+        font-family: "Open Sans", sans-serif;
+    }
+
+    .black {
+        color: #2e3d49;
+    }
+
+    .light {
+        color: #7d97ad;
+    }
+
+    .titles {
+        font-size: 14px;
+        line-height: 24px;
+        font-family: "Open Sans", sans-serif;
+        font-weight: 700;
+    }
+
+
+    .h-divider {
+        height:1px;
+        width:105%;
+        border-top:1px solid gray;
+    }
+
+    .card-header {
+        padding: .75rem 1.25rem;
+        margin-bottom: 0;
+        background-color: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid rgba(0, 0, 0, 0);
+    }
+
+    .footer-copyright {
+      margin-bottom: 0;
+      color: black;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 100;
+    }
+
+    .footer-copyright a {
+      font-weight: 100;
+      color: black;
+    }
+
+    .footer-copyright a:hover {
+      color: #83b718;
+    }
+
+    </style>
+
+</body>
+
+</html>

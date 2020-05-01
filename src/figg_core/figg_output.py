@@ -19,7 +19,7 @@ def print_matrix(matrix, labels = False):
 				string += "\t%.4f" % matrix[i][j]
 		string += '\n'
 
-	print string
+	print(string)
 
 
 def print_matrix_to_file(matrix, filename, labels = False):

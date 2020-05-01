@@ -5,3 +5,7 @@ samples/*.tsv
 Marc/*
 utils/*
 C/*
+*.xml
+*.iml
+.idea/vcs.xml
+archive_old
